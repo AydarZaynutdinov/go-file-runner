@@ -78,7 +78,7 @@ func receiveFile(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-//Get params from request's body
+// Get params from request's body
 func getParams(r *http.Request) (string, multipart.File, *multipart.FileHeader, error) {
 	key := r.FormValue("key")
 	file, fileInfo, err := r.FormFile("file")
@@ -89,12 +89,12 @@ func getParams(r *http.Request) (string, multipart.File, *multipart.FileHeader, 
 	return key, file, fileInfo, nil
 }
 
-//Construct fileName
+// Construct fileName
 func getFileName(key string) string {
 	return key + time.Now().Format(datePattern) + ".go"
 }
 
-//Create folder
+// Create folder
 func createFolder(key string) (string, error) {
 	folderName := key + time.Now().Format(datePattern)
 	err := os.Mkdir(folderName, fs.ModeDir)
@@ -105,7 +105,7 @@ func createFolder(key string) (string, error) {
 	return folderName, nil
 }
 
-//Save file
+// Save file
 func saveFile(file multipart.File, fileInfo *multipart.FileHeader, fileName string, folderName string) error {
 	fileData := make([]byte, fileInfo.Size)
 	_, err := file.Read(fileData)
@@ -122,34 +122,9 @@ func saveFile(file multipart.File, fileInfo *multipart.FileHeader, fileName stri
 	return nil
 }
 
-//Run file
+// Run file
 func runFile(fileName string, folderName string, w http.ResponseWriter) error {
-	//Если использовать вот этот метод, то будут подгружаться все зависимости, необходимые для работы исполняемого файла
-	//Так же будет обновлен go.mod файл
-	runModTidy(fileName)
-
 	return runCode(fileName, folderName, w)
-}
-
-func runModTidy(fileName string) {
-	var modStdErr bytes.Buffer
-	var modStdOut bytes.Buffer
-
-	modCmd := exec.Command("go", "mod", "tidy")
-	modCmd.Stderr = &modStdErr
-	modCmd.Stdout = &modStdOut
-	err := modCmd.Run()
-	if err != nil {
-		log.Printf("runFile: error during run `mode tidy` for file: %s", fileName)
-	}
-	if modStdErr.Len() != 0 {
-		log.Println("mod tidy error:")
-		log.Println(modStdErr.String())
-	}
-	if modStdOut.Len() != 0 {
-		log.Println("mod tidy out:")
-		log.Println(modStdOut.String())
-	}
 }
 
 func runCode(fileName string, folderName string, w http.ResponseWriter) error {
@@ -176,7 +151,7 @@ func runCode(fileName string, folderName string, w http.ResponseWriter) error {
 	return err
 }
 
-//Remove file
+// Remove file
 func removeFile(fileName string, folderName string) error {
 	err := os.Remove(filepath.Join(folderName, fileName))
 	if err != nil {
