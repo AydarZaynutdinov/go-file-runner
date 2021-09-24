@@ -124,6 +124,8 @@ func saveFile(file multipart.File, fileInfo *multipart.FileHeader, fileName stri
 
 //Run file
 func runFile(fileName string, folderName string, w http.ResponseWriter) error {
+	//Если использовать вот этот метод, то будут подгружаться все зависимости, необходимые для работы исполняемого файла
+	//Так же будет обновлен go.mod файл
 	runModTidy(fileName)
 
 	return runCode(fileName, folderName, w)
